@@ -2,8 +2,15 @@ export const PLUGIN_INFO = {
   id: 'lampa_iptv',
   component: 'lampa_iptv',
   name: 'Lampa IPTV',
-  version: '1.0.0',
-  schemaVersion: 3
+  version: '1.1.0',
+  schemaVersion: 4
+} as const;
+
+export const DIESEL_CLIENT = {
+  id: 'diesel_iptv',
+  name: 'Дизель ТВ',
+  scriptUrl: 'https://andreyurl54.github.io/diesel5/diesel.js',
+  repositoryUrl: 'https://github.com/andreyurl54/diesel5'
 } as const;
 
 export const LIMITS = {

@@ -1,12 +1,20 @@
 {
   "id": "lampa_iptv",
   "name": "Lampa IPTV",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "IPTV-клиент Lampa со строгим реестром из 28 каналов",
   "entry": "plugin.js",
   "minified": "plugin.min.js",
   "language": "ru",
   "channels": 28,
   "telemetry": false,
-  "builtAt": "2026-07-23T19:34:50.174Z"
+  "optionalClients": [
+    {
+      "id": "diesel_iptv",
+      "name": "Дизель ТВ",
+      "enabledByDefault": false,
+      "script": "https://andreyurl54.github.io/diesel5/diesel.js"
+    }
+  ],
+  "builtAt": "2026-07-23T20:41:39.635Z"
 }

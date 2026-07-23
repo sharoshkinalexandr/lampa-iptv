@@ -85,6 +85,7 @@ export interface AdultSettings {
 
 export interface PluginPreferences {
   enabled: boolean;
+  dieselClientEnabled: boolean;
   view: 'grid' | 'list';
   checkBeforePlay: boolean;
   autoFallback: boolean;

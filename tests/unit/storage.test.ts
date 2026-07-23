@@ -26,10 +26,19 @@ describe('локальное состояние', () => {
     });
 
     expect(state.preferences.view).toBe('list');
+    expect(state.preferences.dieselClientEnabled).toBe(false);
     expect(state.preferences.connectionTimeoutMs).toBe(60_000);
     expect(state.favorites).toEqual(['ntv']);
     expect(Object.keys(state.channelOverrides)).toEqual(['ntv']);
     expect(state.history).toEqual([{ channelId: 'ntv', watchedAt: 2 }]);
+  });
+
+  it('сохраняет явное согласие на сторонний клиент', () => {
+    const state = migrateState({
+      preferences: { dieselClientEnabled: true }
+    });
+
+    expect(state.preferences.dieselClientEnabled).toBe(true);
   });
 
   it('всегда строит только 28 runtime-каналов', () => {

@@ -28,6 +28,14 @@ const manifest = {
   language: 'ru',
   channels: 28,
   telemetry: false,
+  optionalClients: [
+    {
+      id: 'diesel_iptv',
+      name: 'Дизель ТВ',
+      enabledByDefault: false,
+      script: 'https://andreyurl54.github.io/diesel5/diesel.js'
+    }
+  ],
   builtAt
 };
 await writeFile(path.join(dist, 'manifest.json'), `${JSON.stringify(manifest, null, 2)}\n`);

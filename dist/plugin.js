@@ -1,4 +1,4 @@
-/*! Lampa IPTV v1.0.0 | MIT | no telemetry */
+/*! Lampa IPTV v1.1.0 | MIT | built-in client has no telemetry */
 (function () {
   'use strict';
 
@@ -232,8 +232,14 @@
   var PLUGIN_INFO = {
     component: 'lampa_iptv',
     name: 'Lampa IPTV',
-    version: '1.0.0',
-    schemaVersion: 3
+    version: '1.1.0',
+    schemaVersion: 4
+  };
+  var DIESEL_CLIENT = {
+    id: 'diesel_iptv',
+    name: 'Дизель ТВ',
+    scriptUrl: 'https://andreyurl54.github.io/diesel5/diesel.js',
+    repositoryUrl: 'https://github.com/andreyurl54/diesel5'
   };
   var LIMITS = {
     maxM3uBytes: 20 * 1024 * 1024,
@@ -242,6 +248,64 @@
     maxPrograms: 250000,
     maxSourcesPerChannel: 3};
   var TEST_HLS_URL = 'https://test-streams.mux.dev/x36xhzz/x36xhzz.m3u8';
+
+  var SCRIPT_ID = 'lampa-iptv-diesel-client';
+  var loading;
+  function isOfficialScript(script) {
+    var _a;
+    try {
+      return new URL(script.src, (_a = globalThis.location) === null || _a === void 0 ? void 0 : _a.href).href === DIESEL_CLIENT.scriptUrl;
+    } catch (_b) {
+      return false;
+    }
+  }
+  function isDieselClientLoaded() {
+    if (globalThis.plugin_diesel_iptv_ready === true) return true;
+    return Array.from(document.scripts).some(isOfficialScript);
+  }
+  function loadDieselClient(Lampa) {
+    if (globalThis.plugin_diesel_iptv_ready === true) {
+      return Promise.resolve();
+    }
+    if (loading) return loading;
+    var existing = Array.from(document.scripts).find(isOfficialScript);
+    if ((existing === null || existing === void 0 ? void 0 : existing.dataset.lampaIptvLoaded) === 'true') return Promise.resolve();
+    loading = new Promise((resolve, reject) => {
+      var script = existing !== null && existing !== void 0 ? existing : document.createElement('script');
+      var finish = () => {
+        script.dataset.lampaIptvLoaded = 'true';
+        resolve();
+      };
+      var fail = () => {
+        if (!existing) script.remove();
+        loading = undefined;
+        reject(new Error('Не удалось загрузить официальный клиент «Дизель ТВ».'));
+      };
+      script.addEventListener('load', finish, {
+        once: true
+      });
+      script.addEventListener('error', fail, {
+        once: true
+      });
+      if (!existing) {
+        script.id = SCRIPT_ID;
+        script.src = DIESEL_CLIENT.scriptUrl;
+        script.async = true;
+        script.referrerPolicy = 'no-referrer';
+        document.head.append(script);
+      }
+    });
+    loading.catch(error => {
+      var _a, _b;
+      (_b = (_a = Lampa === null || Lampa === void 0 ? void 0 : Lampa.Noty) === null || _a === void 0 ? void 0 : _a.show) === null || _b === void 0 ? void 0 : _b.call(_a, error.message);
+    });
+    return loading;
+  }
+  function removeDieselLoader() {
+    var _a;
+    (_a = document.getElementById(SCRIPT_ID)) === null || _a === void 0 ? void 0 : _a.remove();
+    loading = undefined;
+  }
 
   function channel(seed) {
     var _a;
@@ -1345,6 +1409,7 @@
   var STORAGE_KEY = 'lampa_iptv_state';
   var DEFAULT_PREFERENCES = {
     enabled: true,
+    dieselClientEnabled: false,
     view: 'grid',
     checkBeforePlay: false,
     autoFallback: true,
@@ -1413,6 +1478,7 @@
     var preferences = safeObject(input.preferences);
     state.preferences = Object.assign(Object.assign(Object.assign({}, state.preferences), preferences), {
       enabled: preferences.enabled !== false,
+      dieselClientEnabled: preferences.dieselClientEnabled === true,
       view: preferences.view === 'list' ? 'list' : 'grid',
       connectionTimeoutMs: Math.min(60000, Math.max(3000, Number(preferences.connectionTimeoutMs) || 12000)),
       retries: Math.min(5, Math.max(0, Number(preferences.retries) || 0))
@@ -3926,7 +3992,7 @@
         var header = element('div', 'lampa-iptv__header');
         header.append(element('div', 'lampa-iptv__brand', 'Источники и каналы'), element('div', 'lampa-iptv__version', 'Импортируются только совпадения с утверждёнными 28 каналами'));
         var actions = element('div', 'lampa-iptv-actions');
-        actions.append(this.action('Удалённый M3U', 'Загрузить плейлист по URL', () => this.remoteM3u()), this.action('Вставить M3U', 'Вставить полный текст или одну запись', () => this.pasteM3u()), this.action('Импорт файла', 'Выбрать .m3u или .m3u8 через File API', () => this.fileM3u()), this.action('Xtream Codes', 'Подключить легальную подписку пользователя', () => this.xtream()), this.action('Последний отчёт', 'Совпадения и проигнорированные записи', () => this.showReport()), this.action('Ручное сопоставление', 'Сохранить правило для следующего импорта', () => this.manualMapping()), this.action('Экспорт', 'Резервная копия без секретов по умолчанию', () => this.exportBackup()), this.action('Импорт копии', 'Восстановить файл lampa-iptv-backup', () => this.importBackup()));
+        actions.append(this.action(DIESEL_CLIENT.name, runtime.state.preferences.dieselClientEnabled ? 'Сторонний клиент включён' : 'Подключить полный сторонний IPTV-клиент', () => this.dieselClient()), this.action('Удалённый M3U', 'Загрузить плейлист по URL', () => this.remoteM3u()), this.action('Вставить M3U', 'Вставить полный текст или одну запись', () => this.pasteM3u()), this.action('Импорт файла', 'Выбрать .m3u или .m3u8 через File API', () => this.fileM3u()), this.action('Xtream Codes', 'Подключить легальную подписку пользователя', () => this.xtream()), this.action('Последний отчёт', 'Совпадения и проигнорированные записи', () => this.showReport()), this.action('Ручное сопоставление', 'Сохранить правило для следующего импорта', () => this.manualMapping()), this.action('Экспорт', 'Резервная копия без секретов по умолчанию', () => this.exportBackup()), this.action('Импорт копии', 'Восстановить файл lampa-iptv-backup', () => this.importBackup()));
         var title = element('div', 'lampa-iptv-section__title', 'Настройки каждого канала');
         var list = element('div', 'lampa-iptv-channel-settings');
         var adultUnlocked = isAdultUnlocked(runtime.state);
@@ -3993,162 +4059,223 @@
         this.root.append(header, actions, title, list);
         (_b = (_a = this.activity) === null || _a === void 0 ? void 0 : _a.loader) === null || _b === void 0 ? void 0 : _b.call(_a, false);
       }
-      remoteM3u() {
+      dieselClient() {
         var _this2 = this;
         return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee2() {
-          var url, name, report, _t, _t2;
+          var disable, accepted, _t;
           return _regenerator().w(function (_context2) {
             while (1) switch (_context2.p = _context2.n) {
               case 0:
+                if (!runtime.state.preferences.dieselClientEnabled) {
+                  _context2.n = 3;
+                  break;
+                }
                 _context2.n = 1;
-                return askText(Lampa, 'URL M3U/M3U8-плейлиста');
+                return confirmAction(Lampa, `Отключить ${DIESEL_CLIENT.name}`, 'Автозагрузка стороннего клиента будет отключена. Уже запущенный клиент останется в памяти до полного перезапуска Lampa.');
               case 1:
-                url = _context2.v;
-                if (url) {
+                disable = _context2.v;
+                if (disable) {
                   _context2.n = 2;
                   break;
                 }
                 return _context2.a(2, _this2.start());
               case 2:
-                _context2.n = 3;
-                return askText(Lampa, 'Название источника', 'Удалённый M3U');
+                runtime.state.preferences.dieselClientEnabled = false;
+                _this2.save();
+                notify$1(Lampa, 'Автозагрузка отключена. Полностью перезапустите Lampa.');
+                _this2.rebuild();
+                return _context2.a(2);
               case 3:
-                _t = _context2.v;
-                if (_t) {
-                  _context2.n = 4;
+                _context2.n = 4;
+                return confirmAction(Lampa, `Подключить ${DIESEL_CLIENT.name}`, 'Будет загружен полный официальный сторонний клиент с домена автора. Он выполняется с теми же правами, что и другие плагины Lampa, использует собственные настройки, внешние сервисы и может обрабатывать данные аккаунта Lampa. Подключайте только разрешённые вам IPTV-подписки.');
+              case 4:
+                accepted = _context2.v;
+                if (accepted) {
+                  _context2.n = 5;
                   break;
                 }
-                _t = 'Удалённый M3U';
-              case 4:
-                name = _t;
-                _context2.p = 5;
-                notify$1(Lampa, 'Загрузка плейлиста…');
-                _context2.n = 6;
-                return importRemoteM3u(runtime.state, url, name, runtime.state.preferences.connectionTimeoutMs);
-              case 6:
-                report = _context2.v;
+                return _context2.a(2, _this2.start());
+              case 5:
+                runtime.state.preferences.dieselClientEnabled = true;
                 _this2.save();
-                notify$1(Lampa, reportText(report));
-                _this2.rebuild();
-                _context2.n = 8;
-                break;
+                notify$1(Lampa, `Загрузка ${DIESEL_CLIENT.name}…`);
+                _context2.p = 6;
+                _context2.n = 7;
+                return loadDieselClient(Lampa);
               case 7:
-                _context2.p = 7;
-                _t2 = _context2.v;
-                notify$1(Lampa, _t2.message);
-                _this2.start();
+                notify$1(Lampa, isDieselClientLoaded() ? `${DIESEL_CLIENT.name} подключён. Его пункт появится в главном меню; при необходимости перезапустите Lampa.` : `${DIESEL_CLIENT.name} загружен. Перезапустите Lampa.`);
+                _this2.rebuild();
+                _context2.n = 9;
+                break;
               case 8:
+                _context2.p = 8;
+                _t = _context2.v;
+                runtime.state.preferences.dieselClientEnabled = false;
+                _this2.save();
+                notify$1(Lampa, _t.message);
+                _this2.rebuild();
+              case 9:
                 return _context2.a(2);
             }
-          }, _callee2, null, [[5, 7]]);
+          }, _callee2, null, [[6, 8]]);
         }))();
       }
-      pasteM3u() {
+      remoteM3u() {
         var _this3 = this;
         return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee3() {
-          var content, normalized, report;
+          var url, name, report, _t2, _t3;
           return _regenerator().w(function (_context3) {
-            while (1) switch (_context3.n) {
+            while (1) switch (_context3.p = _context3.n) {
               case 0:
                 _context3.n = 1;
-                return askMultiline(Lampa, 'Вставка M3U');
+                return askText(Lampa, 'URL M3U/M3U8-плейлиста');
               case 1:
-                content = _context3.v;
-                if (content) {
+                url = _context3.v;
+                if (url) {
                   _context3.n = 2;
                   break;
                 }
                 return _context3.a(2, _this3.start());
               case 2:
-                try {
-                  normalized = content.includes('#EXTM3U') ? content : `#EXTM3U\n${content}`;
-                  report = importM3uText(runtime.state, normalized, 'Вставленный M3U');
-                  _this3.save();
-                  notify$1(Lampa, reportText(report));
-                  _this3.rebuild();
-                } catch (error) {
-                  notify$1(Lampa, error.message);
-                  _this3.start();
-                }
+                _context3.n = 3;
+                return askText(Lampa, 'Название источника', 'Удалённый M3U');
               case 3:
+                _t2 = _context3.v;
+                if (_t2) {
+                  _context3.n = 4;
+                  break;
+                }
+                _t2 = 'Удалённый M3U';
+              case 4:
+                name = _t2;
+                _context3.p = 5;
+                notify$1(Lampa, 'Загрузка плейлиста…');
+                _context3.n = 6;
+                return importRemoteM3u(runtime.state, url, name, runtime.state.preferences.connectionTimeoutMs);
+              case 6:
+                report = _context3.v;
+                _this3.save();
+                notify$1(Lampa, reportText(report));
+                _this3.rebuild();
+                _context3.n = 8;
+                break;
+              case 7:
+                _context3.p = 7;
+                _t3 = _context3.v;
+                notify$1(Lampa, _t3.message);
+                _this3.start();
+              case 8:
                 return _context3.a(2);
             }
-          }, _callee3);
+          }, _callee3, null, [[5, 7]]);
         }))();
       }
-      fileM3u() {
+      pasteM3u() {
         var _this4 = this;
         return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee4() {
-          var file, report, _t3;
+          var content, normalized, report;
           return _regenerator().w(function (_context4) {
-            while (1) switch (_context4.p = _context4.n) {
+            while (1) switch (_context4.n) {
               case 0:
-                _context4.p = 0;
                 _context4.n = 1;
-                return readLocalFile('.m3u,.m3u8,text/plain,application/x-mpegURL');
+                return askMultiline(Lampa, 'Вставка M3U');
               case 1:
-                file = _context4.v;
-                if (file) {
+                content = _context4.v;
+                if (content) {
                   _context4.n = 2;
                   break;
                 }
                 return _context4.a(2, _this4.start());
               case 2:
-                report = importM3uText(runtime.state, file.content, file.name);
-                _this4.save();
-                notify$1(Lampa, reportText(report));
-                _this4.rebuild();
-                _context4.n = 4;
-                break;
+                try {
+                  normalized = content.includes('#EXTM3U') ? content : `#EXTM3U\n${content}`;
+                  report = importM3uText(runtime.state, normalized, 'Вставленный M3U');
+                  _this4.save();
+                  notify$1(Lampa, reportText(report));
+                  _this4.rebuild();
+                } catch (error) {
+                  notify$1(Lampa, error.message);
+                  _this4.start();
+                }
               case 3:
-                _context4.p = 3;
-                _t3 = _context4.v;
-                notify$1(Lampa, `${_t3.message} Используйте URL плейлиста или вставку текста.`);
-                _this4.start();
-              case 4:
                 return _context4.a(2);
             }
-          }, _callee4, null, [[0, 3]]);
+          }, _callee4);
         }))();
       }
-      xtream() {
+      fileM3u() {
         var _this5 = this;
         return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee5() {
-          var server, username, password, account, report, _t4;
+          var file, report, _t4;
           return _regenerator().w(function (_context5) {
             while (1) switch (_context5.p = _context5.n) {
               case 0:
+                _context5.p = 0;
                 _context5.n = 1;
-                return askText(Lampa, 'Адрес сервера Xtream (HTTP/HTTPS)');
+                return readLocalFile('.m3u,.m3u8,text/plain,application/x-mpegURL');
               case 1:
-                server = _context5.v;
-                if (server) {
+                file = _context5.v;
+                if (file) {
                   _context5.n = 2;
                   break;
                 }
                 return _context5.a(2, _this5.start());
               case 2:
-                _context5.n = 3;
-                return askText(Lampa, 'Имя пользователя Xtream');
+                report = importM3uText(runtime.state, file.content, file.name);
+                _this5.save();
+                notify$1(Lampa, reportText(report));
+                _this5.rebuild();
+                _context5.n = 4;
+                break;
               case 3:
-                username = _context5.v;
-                if (username) {
-                  _context5.n = 4;
+                _context5.p = 3;
+                _t4 = _context5.v;
+                notify$1(Lampa, `${_t4.message} Используйте URL плейлиста или вставку текста.`);
+                _this5.start();
+              case 4:
+                return _context5.a(2);
+            }
+          }, _callee5, null, [[0, 3]]);
+        }))();
+      }
+      xtream() {
+        var _this6 = this;
+        return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6() {
+          var server, username, password, account, report, _t5;
+          return _regenerator().w(function (_context6) {
+            while (1) switch (_context6.p = _context6.n) {
+              case 0:
+                _context6.n = 1;
+                return askText(Lampa, 'Адрес сервера Xtream (HTTP/HTTPS)');
+              case 1:
+                server = _context6.v;
+                if (server) {
+                  _context6.n = 2;
                   break;
                 }
-                return _context5.a(2, _this5.start());
+                return _context6.a(2, _this6.start());
+              case 2:
+                _context6.n = 3;
+                return askText(Lampa, 'Имя пользователя Xtream');
+              case 3:
+                username = _context6.v;
+                if (username) {
+                  _context6.n = 4;
+                  break;
+                }
+                return _context6.a(2, _this6.start());
               case 4:
-                _context5.n = 5;
+                _context6.n = 5;
                 return askText(Lampa, 'Пароль Xtream', '', {
                   password: true
                 });
               case 5:
-                password = _context5.v;
+                password = _context6.v;
                 if (password) {
-                  _context5.n = 6;
+                  _context6.n = 6;
                   break;
                 }
-                return _context5.a(2, _this5.start());
+                return _context6.a(2, _this6.start());
               case 6:
                 account = {
                   id: stableId('xtream', `${server}:${username}`),
@@ -4158,26 +4285,26 @@
                   password,
                   enabled: true
                 };
-                _context5.p = 7;
+                _context6.p = 7;
                 notify$1(Lampa, 'Загрузка списка live streams…');
-                _context5.n = 8;
+                _context6.n = 8;
                 return importXtream(runtime.state, account, runtime.state.preferences.connectionTimeoutMs);
               case 8:
-                report = _context5.v;
-                _this5.save();
+                report = _context6.v;
+                _this6.save();
                 notify$1(Lampa, reportText(report));
-                _this5.rebuild();
-                _context5.n = 10;
+                _this6.rebuild();
+                _context6.n = 10;
                 break;
               case 9:
-                _context5.p = 9;
-                _t4 = _context5.v;
-                notify$1(Lampa, _t4.message);
-                _this5.start();
+                _context6.p = 9;
+                _t5 = _context6.v;
+                notify$1(Lampa, _t5.message);
+                _this6.start();
               case 10:
-                return _context5.a(2);
+                return _context6.a(2);
             }
-          }, _callee5, null, [[7, 9]]);
+          }, _callee6, null, [[7, 9]]);
         }))();
       }
       showReport() {
@@ -4200,127 +4327,127 @@
         });
       }
       manualMapping() {
-        var _this6 = this;
-        return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee6() {
-          var _a, _b, ignored, entry, channel;
-          return _regenerator().w(function (_context6) {
-            while (1) switch (_context6.n) {
-              case 0:
-                ignored = (_b = (_a = runtime.state.lastImportReport) === null || _a === void 0 ? void 0 : _a.ignoredEntries) !== null && _b !== void 0 ? _b : [];
-                if (ignored.length) {
-                  _context6.n = 1;
-                  break;
-                }
-                notify$1(Lampa, 'В последнем импорте нет неопознанных записей.');
-                return _context6.a(2);
-              case 1:
-                _context6.n = 2;
-                return choose(Lampa, 'Неопознанная запись', ignored.slice(0, 100).map(item => ({
-                  title: `${item.name}${item.tvgId ? ` [${item.tvgId}]` : ''}`,
-                  item
-                })), () => _this6.start());
-              case 2:
-                entry = _context6.v;
-                if (entry) {
-                  _context6.n = 3;
-                  break;
-                }
-                return _context6.a(2);
-              case 3:
-                _context6.n = 4;
-                return choose(Lampa, 'Сопоставить с каналом', CHANNELS.map(item => ({
-                  title: `${item.number}. ${item.name}`,
-                  item
-                })), () => _this6.start());
-              case 4:
-                channel = _context6.v;
-                if (channel) {
-                  _context6.n = 5;
-                  break;
-                }
-                return _context6.a(2);
-              case 5:
-                setManualMapping(runtime.state, entry.item.tvgId || entry.item.name, channel.item.id);
-                _this6.save();
-                notify$1(Lampa, 'Правило сохранено. Повторите импорт плейлиста.');
-                _this6.start();
-              case 6:
-                return _context6.a(2);
-            }
-          }, _callee6);
-        }))();
-      }
-      exportBackup() {
         var _this7 = this;
         return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee7() {
-          var includeSecrets, backup;
+          var _a, _b, ignored, entry, channel;
           return _regenerator().w(function (_context7) {
             while (1) switch (_context7.n) {
               case 0:
-                includeSecrets = false;
-                if (!runtime.state.xtreamAccounts.length) {
-                  _context7.n = 2;
+                ignored = (_b = (_a = runtime.state.lastImportReport) === null || _a === void 0 ? void 0 : _a.ignoredEntries) !== null && _b !== void 0 ? _b : [];
+                if (ignored.length) {
+                  _context7.n = 1;
                   break;
                 }
-                _context7.n = 1;
-                return confirmAction(Lampa, 'Экспорт секретов', 'По умолчанию пароли, токены, cookies, Authorization и приватные URL не экспортируются. Включить секреты в этот файл? Храните такой файл как пароль.');
+                notify$1(Lampa, 'В последнем импорте нет неопознанных записей.');
+                return _context7.a(2);
               case 1:
-                includeSecrets = _context7.v;
+                _context7.n = 2;
+                return choose(Lampa, 'Неопознанная запись', ignored.slice(0, 100).map(item => ({
+                  title: `${item.name}${item.tvgId ? ` [${item.tvgId}]` : ''}`,
+                  item
+                })), () => _this7.start());
               case 2:
-                backup = createBackup(runtime.state, includeSecrets);
-                downloadText(`lampa-iptv-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(backup, null, 2));
-                notify$1(Lampa, includeSecrets ? 'Копия с секретами создана.' : 'Безопасная копия создана.');
-                _this7.start();
+                entry = _context7.v;
+                if (entry) {
+                  _context7.n = 3;
+                  break;
+                }
+                return _context7.a(2);
               case 3:
+                _context7.n = 4;
+                return choose(Lampa, 'Сопоставить с каналом', CHANNELS.map(item => ({
+                  title: `${item.number}. ${item.name}`,
+                  item
+                })), () => _this7.start());
+              case 4:
+                channel = _context7.v;
+                if (channel) {
+                  _context7.n = 5;
+                  break;
+                }
+                return _context7.a(2);
+              case 5:
+                setManualMapping(runtime.state, entry.item.tvgId || entry.item.name, channel.item.id);
+                _this7.save();
+                notify$1(Lampa, 'Правило сохранено. Повторите импорт плейлиста.');
+                _this7.start();
+              case 6:
                 return _context7.a(2);
             }
           }, _callee7);
         }))();
       }
-      importBackup() {
+      exportBackup() {
         var _this8 = this;
         return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee8() {
-          var file, parsed, accepted, _t5;
+          var includeSecrets, backup;
           return _regenerator().w(function (_context8) {
-            while (1) switch (_context8.p = _context8.n) {
+            while (1) switch (_context8.n) {
               case 0:
-                _context8.p = 0;
-                _context8.n = 1;
-                return readLocalFile('.json,application/json');
-              case 1:
-                file = _context8.v;
-                if (file) {
+                includeSecrets = false;
+                if (!runtime.state.xtreamAccounts.length) {
                   _context8.n = 2;
                   break;
                 }
-                return _context8.a(2, _this8.start());
+                _context8.n = 1;
+                return confirmAction(Lampa, 'Экспорт секретов', 'По умолчанию пароли, токены, cookies, Authorization и приватные URL не экспортируются. Включить секреты в этот файл? Храните такой файл как пароль.');
+              case 1:
+                includeSecrets = _context8.v;
               case 2:
-                parsed = parseBackup(file.content);
-                _context8.n = 3;
-                return confirmAction(Lampa, 'Восстановление', parsed.report.join('\n'));
-              case 3:
-                accepted = _context8.v;
-                if (accepted) {
-                  _context8.n = 4;
-                  break;
-                }
-                return _context8.a(2, _this8.start());
-              case 4:
-                Object.assign(runtime.state, parsed.state);
-                _this8.save();
-                notify$1(Lampa, 'Резервная копия восстановлена.');
-                _this8.rebuild();
-                _context8.n = 6;
-                break;
-              case 5:
-                _context8.p = 5;
-                _t5 = _context8.v;
-                notify$1(Lampa, _t5.message);
+                backup = createBackup(runtime.state, includeSecrets);
+                downloadText(`lampa-iptv-backup-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(backup, null, 2));
+                notify$1(Lampa, includeSecrets ? 'Копия с секретами создана.' : 'Безопасная копия создана.');
                 _this8.start();
-              case 6:
+              case 3:
                 return _context8.a(2);
             }
-          }, _callee8, null, [[0, 5]]);
+          }, _callee8);
+        }))();
+      }
+      importBackup() {
+        var _this9 = this;
+        return _asyncToGenerator(/*#__PURE__*/_regenerator().m(function _callee9() {
+          var file, parsed, accepted, _t6;
+          return _regenerator().w(function (_context9) {
+            while (1) switch (_context9.p = _context9.n) {
+              case 0:
+                _context9.p = 0;
+                _context9.n = 1;
+                return readLocalFile('.json,application/json');
+              case 1:
+                file = _context9.v;
+                if (file) {
+                  _context9.n = 2;
+                  break;
+                }
+                return _context9.a(2, _this9.start());
+              case 2:
+                parsed = parseBackup(file.content);
+                _context9.n = 3;
+                return confirmAction(Lampa, 'Восстановление', parsed.report.join('\n'));
+              case 3:
+                accepted = _context9.v;
+                if (accepted) {
+                  _context9.n = 4;
+                  break;
+                }
+                return _context9.a(2, _this9.start());
+              case 4:
+                Object.assign(runtime.state, parsed.state);
+                _this9.save();
+                notify$1(Lampa, 'Резервная копия восстановлена.');
+                _this9.rebuild();
+                _context9.n = 6;
+                break;
+              case 5:
+                _context9.p = 5;
+                _t6 = _context9.v;
+                notify$1(Lampa, _t6.message);
+                _this9.start();
+              case 6:
+                return _context9.a(2);
+            }
+          }, _callee9, null, [[0, 5]]);
         }))();
       }
     };
@@ -4464,6 +4591,9 @@
     var ready = () => {
       updateMenu();
       document.body.classList.toggle('lampa-iptv-low-power', state.preferences.lowPowerMode);
+      if (state.preferences.dieselClientEnabled) {
+        void loadDieselClient(Lampa);
+      }
       void checkVersion(Lampa, baseUrl);
     };
     var appListener;
@@ -4485,6 +4615,7 @@
         (_a = document.querySelector('.lampa-iptv-menu-item')) === null || _a === void 0 ? void 0 : _a.remove();
         if (appListener && ((_b = Lampa.Listener) === null || _b === void 0 ? void 0 : _b.remove)) Lampa.Listener.remove('app', appListener);
         removeSettings();
+        removeDieselLoader();
         (_d = (_c = Lampa.Component) === null || _c === void 0 ? void 0 : _c.add) === null || _d === void 0 ? void 0 : _d.call(_c, PLUGIN_INFO.component, undefined);
       }
     };
