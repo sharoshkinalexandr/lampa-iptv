@@ -1,0 +1,170 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <title>Lampa IPTV — браузерное демо</title>
+    <style>
+      :root {
+        color-scheme: dark;
+        font-family:
+          Inter,
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          'Segoe UI',
+          sans-serif;
+        background: #080d12;
+        color: #fff;
+      }
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background:
+          radial-gradient(circle at 80% 10%, #173929 0, transparent 35rem),
+          linear-gradient(145deg, #080d12, #101820);
+      }
+      .demo-shell {
+        display: grid;
+        grid-template-columns: 12rem 1fr;
+        min-height: 100vh;
+      }
+      .menu {
+        padding: 2rem 1rem;
+        border-right: 1px solid rgb(255 255 255 / 8%);
+        background: rgb(4 8 11 / 70%);
+      }
+      .menu__brand {
+        margin: 0 0 2rem;
+        padding: 0 0.8rem;
+        font-weight: 800;
+        letter-spacing: -0.03em;
+      }
+      .menu__list {
+        display: grid;
+        gap: 0.5rem;
+        margin: 0;
+        padding: 0;
+        list-style: none;
+      }
+      .menu__item {
+        display: flex;
+        align-items: center;
+        gap: 0.8rem;
+        min-height: 3rem;
+        padding: 0.7rem 0.8rem;
+        border-radius: 0.8rem;
+        cursor: pointer;
+      }
+      .menu__item:focus,
+      .menu__item:hover {
+        outline: none;
+        background: rgb(83 209 141 / 18%);
+      }
+      .menu__ico {
+        width: 1.8rem;
+        height: 1.8rem;
+      }
+      .menu__ico svg {
+        width: 100%;
+        height: 100%;
+      }
+      #content {
+        min-width: 0;
+        padding: 1.5rem;
+      }
+      .demo-welcome {
+        max-width: 48rem;
+        padding: 4rem 2rem;
+      }
+      .demo-welcome h1 {
+        font-size: clamp(2.4rem, 6vw, 5rem);
+        line-height: 0.95;
+        margin: 0 0 1.5rem;
+      }
+      .demo-welcome p {
+        max-width: 38rem;
+        color: #aebac3;
+        font-size: 1.1rem;
+      }
+      .demo-player,
+      .demo-modal,
+      .demo-toast {
+        position: fixed;
+        z-index: 1000;
+        border: 1px solid rgb(255 255 255 / 12%);
+        background: #111a21;
+        box-shadow: 0 1.5rem 5rem rgb(0 0 0 / 45%);
+      }
+      .demo-player,
+      .demo-modal {
+        inset: 10% 12%;
+        display: grid;
+        place-content: center;
+        padding: 2rem;
+        border-radius: 1rem;
+        text-align: center;
+      }
+      .demo-player button,
+      .demo-modal button {
+        margin: 1rem auto 0;
+        padding: 0.7rem 1.2rem;
+      }
+      .demo-toast {
+        right: 1.5rem;
+        bottom: 1.5rem;
+        max-width: 28rem;
+        padding: 1rem 1.2rem;
+        border-radius: 0.7rem;
+      }
+      @media (max-width: 700px) {
+        .demo-shell {
+          grid-template-columns: 1fr;
+        }
+        .menu {
+          padding: 0.7rem;
+          border: 0;
+        }
+        .menu__brand,
+        .menu__text {
+          display: none;
+        }
+        .menu__list {
+          display: flex;
+        }
+        #content {
+          padding: 0.7rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-shell">
+      <aside class="menu">
+        <div class="menu__brand">Lampa mock</div>
+        <ul class="menu__list">
+          <li class="menu__item selector" tabindex="0">
+            <div class="menu__ico">⌂</div>
+            <div class="menu__text">Главная</div>
+          </li>
+        </ul>
+      </aside>
+      <main id="content">
+        <section class="demo-welcome">
+          <h1>Браузерное демо</h1>
+          <p>
+            Нажмите «ТВ» слева. Это безопасный стенд интерфейса: каналы 18+ скрыты, реальные
+            трансляции и приватные данные отсутствуют.
+          </p>
+          <p>Управление: стрелки, Enter, Escape и мышь.</p>
+        </section>
+      </main>
+    </div>
+    <script src="./mock-lampa.js"></script>
+    <script src="../plugin.js"></script>
+  </body>
+</html>

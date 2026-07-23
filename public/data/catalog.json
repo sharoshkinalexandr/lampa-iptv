@@ -1,0 +1,83 @@
+{
+  "schemaVersion": 1,
+  "generatedAt": "2026-07-23T00:00:00.000Z",
+  "fixed": true,
+  "channels": [
+    { "id": "perviy", "number": 1, "name": "Первый канал", "category": "Основные", "adult": false },
+    { "id": "match-tv", "number": 2, "name": "Матч ТВ", "category": "Основные", "adult": false },
+    { "id": "ntv", "number": 3, "name": "НТВ", "category": "Основные", "adult": false },
+    { "id": "sts", "number": 4, "name": "СТС", "category": "Основные", "adult": false },
+    { "id": "tnt", "number": 5, "name": "ТНТ", "category": "Основные", "adult": false },
+    { "id": "ren-tv", "number": 6, "name": "РЕН ТВ", "category": "Основные", "adult": false },
+    { "id": "friday", "number": 7, "name": "Пятница!", "category": "Основные", "adult": false },
+    { "id": "domashniy", "number": 8, "name": "Домашний", "category": "Основные", "adult": false },
+    { "id": "muz-tv", "number": 9, "name": "Муз-ТВ", "category": "Основные", "adult": false },
+    { "id": "2x2", "number": 10, "name": "2x2", "category": "Основные", "adult": false },
+    { "id": "tv3", "number": 11, "name": "ТВ-3", "category": "Основные", "adult": false },
+    { "id": "tnt4", "number": 12, "name": "ТНТ4", "category": "Основные", "adult": false },
+    {
+      "id": "kinokomediya",
+      "number": 13,
+      "name": "Кинокомедия",
+      "category": "Кино и развлечения",
+      "adult": false
+    },
+    { "id": "che", "number": 14, "name": "Чё!", "category": "Основные", "adult": false },
+    {
+      "id": "dikaya-rybalka",
+      "number": 15,
+      "name": "Дикая рыбалка",
+      "category": "Хобби",
+      "adult": false
+    },
+    { "id": "shalun", "number": 16, "name": "Шалун", "category": "18+", "adult": true },
+    {
+      "id": "blue-hustler-hd",
+      "number": 17,
+      "name": "Blue Hustler HD",
+      "category": "18+",
+      "adult": true
+    },
+    {
+      "id": "russkaya-noch",
+      "number": 18,
+      "name": "Русская ночь",
+      "category": "18+",
+      "adult": true
+    },
+    {
+      "id": "brazzers-tv-europe",
+      "number": 19,
+      "name": "Brazzers TV Europe",
+      "category": "18+",
+      "adult": true
+    },
+    { "id": "playboy-tv", "number": 20, "name": "Playboy TV", "category": "18+", "adult": true },
+    { "id": "babes-tv-hd", "number": 21, "name": "Babes TV HD", "category": "18+", "adult": true },
+    { "id": "red-lips-hd", "number": 22, "name": "Red Lips HD", "category": "18+", "adult": true },
+    {
+      "id": "exxxotica-hd",
+      "number": 23,
+      "name": "Exxxotica HD",
+      "category": "18+",
+      "adult": true
+    },
+    { "id": "eromania", "number": 24, "name": "Eromania", "category": "18+", "adult": true },
+    {
+      "id": "temptation-tv",
+      "number": 25,
+      "name": "Temptation TV",
+      "category": "18+",
+      "adult": true
+    },
+    {
+      "id": "barely-legal",
+      "number": 26,
+      "name": "Barely Legal",
+      "category": "18+",
+      "adult": true
+    },
+    { "id": "o-la-la", "number": 27, "name": "O-la-la", "category": "18+", "adult": true },
+    { "id": "candy", "number": 28, "name": "CANDY", "category": "18+", "adult": true }
+  ]
+}

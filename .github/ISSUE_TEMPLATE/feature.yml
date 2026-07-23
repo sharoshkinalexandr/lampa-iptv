@@ -1,0 +1,27 @@
+name: Предложение
+description: Предложить совместимое улучшение
+title: '[Feature]: '
+labels: ['enhancement']
+body:
+  - type: textarea
+    id: problem
+    attributes:
+      label: Задача
+      description: Какую пользовательскую проблему нужно решить?
+    validations:
+      required: true
+  - type: textarea
+    id: solution
+    attributes:
+      label: Предлагаемое поведение
+    validations:
+      required: true
+  - type: checkboxes
+    id: boundaries
+    attributes:
+      label: Границы проекта
+      options:
+        - label: Предложение не требует обхода DRM, авторизации или геоограничений.
+          required: true
+        - label: Предложение не публикует приватные источники.
+          required: true

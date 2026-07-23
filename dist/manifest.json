@@ -1,0 +1,12 @@
+{
+  "id": "lampa_iptv",
+  "name": "Lampa IPTV",
+  "version": "1.0.0",
+  "description": "IPTV-клиент Lampa со строгим реестром из 28 каналов",
+  "entry": "plugin.js",
+  "minified": "plugin.min.js",
+  "language": "ru",
+  "channels": 28,
+  "telemetry": false,
+  "builtAt": "2026-07-23T19:34:50.174Z"
+}
