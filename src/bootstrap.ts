@@ -1,5 +1,6 @@
 import './styles/plugin.scss';
 import { PLUGIN_INFO } from './config';
+import { loadDieselClient, removeDieselLoader } from './integrations/diesel-client';
 import { createChannelComponent } from './lampa/channel-component';
 import { createDiagnosticsComponent } from './lampa/diagnostics-component';
 import { createMainComponent } from './lampa/main-component';
@@ -119,6 +120,9 @@ export function bootstrap(Lampa: LampaLike, baseUrl: string): BootstrapResult {
   const ready = (): void => {
     updateMenu();
     document.body.classList.toggle('lampa-iptv-low-power', state.preferences.lowPowerMode);
+    if (state.preferences.dieselClientEnabled) {
+      void loadDieselClient(Lampa);
+    }
     void checkVersion(Lampa, baseUrl);
   };
 
@@ -141,6 +145,7 @@ export function bootstrap(Lampa: LampaLike, baseUrl: string): BootstrapResult {
       document.querySelector('.lampa-iptv-menu-item')?.remove();
       if (appListener && Lampa.Listener?.remove) Lampa.Listener.remove('app', appListener);
       removeSettings();
+      removeDieselLoader();
       Lampa.Component?.add?.(PLUGIN_INFO.component, undefined);
     }
   };

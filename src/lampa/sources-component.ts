@@ -1,6 +1,8 @@
+import { DIESEL_CLIENT } from '../config';
 import { CHANNELS } from '../config/channels';
 import { isAdultUnlocked, unlockAdult } from '../core/adult-access';
 import { stableId } from '../core/normalize';
+import { isDieselClientLoaded, loadDieselClient } from '../integrations/diesel-client';
 import {
   importM3uText,
   importRemoteM3u,
@@ -111,6 +113,13 @@ export function createSourcesComponent(runtime: PluginRuntime): new () => any {
       );
       const actions = element('div', 'lampa-iptv-actions');
       actions.append(
+        this.action(
+          DIESEL_CLIENT.name,
+          runtime.state.preferences.dieselClientEnabled
+            ? 'Сторонний клиент включён'
+            : 'Подключить полный сторонний IPTV-клиент',
+          () => this.dieselClient()
+        ),
         this.action('Удалённый M3U', 'Загрузить плейлист по URL', () => this.remoteM3u()),
         this.action('Вставить M3U', 'Вставить полный текст или одну запись', () => this.pasteM3u()),
         this.action('Импорт файла', 'Выбрать .m3u или .m3u8 через File API', () => this.fileM3u()),
@@ -177,6 +186,48 @@ export function createSourcesComponent(runtime: PluginRuntime): new () => any {
       }
       this.root.append(header, actions, title, list);
       this.activity?.loader?.(false);
+    }
+
+    private async dieselClient(): Promise<void> {
+      if (runtime.state.preferences.dieselClientEnabled) {
+        const disable = await confirmAction(
+          Lampa,
+          `Отключить ${DIESEL_CLIENT.name}`,
+          'Автозагрузка стороннего клиента будет отключена. Уже запущенный клиент останется в памяти до полного перезапуска Lampa.'
+        );
+        if (!disable) return this.start();
+        runtime.state.preferences.dieselClientEnabled = false;
+        this.save();
+        notify(Lampa, 'Автозагрузка отключена. Полностью перезапустите Lampa.');
+        this.rebuild();
+        return;
+      }
+
+      const accepted = await confirmAction(
+        Lampa,
+        `Подключить ${DIESEL_CLIENT.name}`,
+        'Будет загружен полный официальный сторонний клиент с домена автора. Он выполняется с теми же правами, что и другие плагины Lampa, использует собственные настройки, внешние сервисы и может обрабатывать данные аккаунта Lampa. Подключайте только разрешённые вам IPTV-подписки.'
+      );
+      if (!accepted) return this.start();
+
+      runtime.state.preferences.dieselClientEnabled = true;
+      this.save();
+      notify(Lampa, `Загрузка ${DIESEL_CLIENT.name}…`);
+      try {
+        await loadDieselClient(Lampa);
+        notify(
+          Lampa,
+          isDieselClientLoaded()
+            ? `${DIESEL_CLIENT.name} подключён. Его пункт появится в главном меню; при необходимости перезапустите Lampa.`
+            : `${DIESEL_CLIENT.name} загружен. Перезапустите Lampa.`
+        );
+        this.rebuild();
+      } catch (error) {
+        runtime.state.preferences.dieselClientEnabled = false;
+        this.save();
+        notify(Lampa, (error as Error).message);
+        this.rebuild();
+      }
     }
 
     private async remoteM3u(): Promise<void> {

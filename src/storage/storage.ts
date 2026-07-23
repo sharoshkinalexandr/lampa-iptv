@@ -13,6 +13,7 @@ const STORAGE_KEY = 'lampa_iptv_state';
 
 export const DEFAULT_PREFERENCES: PluginPreferences = {
   enabled: true,
+  dieselClientEnabled: false,
   view: 'grid',
   checkBeforePlay: false,
   autoFallback: true,
@@ -98,6 +99,7 @@ export function migrateState(value: unknown): StoredState {
     ...state.preferences,
     ...preferences,
     enabled: preferences.enabled !== false,
+    dieselClientEnabled: preferences.dieselClientEnabled === true,
     view: preferences.view === 'list' ? 'list' : 'grid',
     connectionTimeoutMs: Math.min(
       60_000,

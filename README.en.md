@@ -16,6 +16,7 @@ Key features:
 - XMLTV/XMLTV.GZ with now/next data and local cache;
 - local adult PIN; adult entries are excluded from global search, history and public demos;
 - secret-free export by default, diagnostics masking and no telemetry;
+- optional, explicit opt-in loading of the full third-party **Diesel TV** client;
 - CI, Pages and release workflows with SHA-256 checksums.
 
 ## Installation
@@ -42,6 +43,19 @@ Build outputs are written to `dist/`; the deployable static site is written to `
 
 See [README.md](README.md) for the complete Russian guide and [SOURCES_AUDIT.md](SOURCES_AUDIT.md)
 for the per-channel source audit.
+
+## Optional Diesel TV client
+
+Open **TV → Sources → Diesel TV**, review the disclosure and confirm. Lampa IPTV then loads the
+author's official client from:
+
+```text
+https://andreyurl54.github.io/diesel5/diesel.js
+```
+
+Diesel TV keeps its own catalogue, providers, EPG, archive and settings. It is disabled by default
+and does not change the fixed 28-channel registry. Its code is used with the author's permission.
+Because it is an independently updated network client, its own privacy and provider terms apply.
 
 ## Legal and privacy
 

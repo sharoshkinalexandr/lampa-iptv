@@ -65,7 +65,7 @@ function output(file, minify) {
         arrowFunctions: false,
         constBindings: false
       },
-      banner: '/*! Lampa IPTV v1.0.0 | MIT | no telemetry */'
+      banner: '/*! Lampa IPTV v1.1.0 | MIT | built-in client has no telemetry */'
     },
     plugins: createPlugins(minify),
     treeshake: {
