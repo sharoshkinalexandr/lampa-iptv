@@ -1,0 +1,17 @@
+node_modules/
+coverage/
+site/
+*.log
+.DS_Store
+.env
+.env.*
+!.env.example
+
+# Локальные IPTV-данные и секреты никогда не коммитятся.
+*.m3u
+*.m3u8
+*.xml
+*.xml.gz
+*.backup.json
+private/
+secrets/

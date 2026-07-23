@@ -1,0 +1,367 @@
+.lampa-iptv {
+  --iptv-accent: #53d18d;
+  --iptv-warning: #ffbf69;
+  --iptv-danger: #ff6b6b;
+  color: #fff;
+  min-height: 100%;
+  padding: 2.2em 3em 4em;
+  box-sizing: border-box;
+  background:
+    radial-gradient(circle at 15% 10%, rgba(83, 209, 141, 0.14), transparent 32em),
+    linear-gradient(145deg, rgba(9, 22, 30, 0.96), rgba(14, 14, 20, 0.98));
+
+  &__header {
+    display: flex;
+    align-items: baseline;
+    gap: 1.2em;
+    margin-bottom: 1.8em;
+  }
+
+  &__brand {
+    font-size: 2.2em;
+    font-weight: 700;
+    letter-spacing: -0.03em;
+  }
+
+  &__version {
+    opacity: 0.62;
+    font-size: 0.95em;
+  }
+
+  &__layout {
+    display: grid;
+    grid-template-columns: minmax(13em, 18em) 1fr;
+    gap: 2em;
+  }
+
+  &__navigation {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45em;
+    position: sticky;
+    top: 1em;
+    align-self: start;
+  }
+
+  &__content {
+    min-width: 0;
+  }
+}
+
+.lampa-iptv-nav {
+  padding: 0.9em 1em;
+  border-radius: 0.7em;
+  background: rgba(255, 255, 255, 0.06);
+  transition:
+    transform 0.16s ease,
+    background 0.16s ease;
+
+  &.active {
+    color: #08140e;
+    background: var(--iptv-accent);
+    font-weight: 700;
+  }
+}
+
+.lampa-iptv .selector.focus,
+.lampa-iptv .selector:focus,
+.lampa-iptv .selector:hover {
+  outline: 0.18em solid #fff;
+  outline-offset: 0.16em;
+  transform: scale(1.025);
+}
+
+.lampa-iptv-section {
+  &__header {
+    display: flex;
+    align-items: baseline;
+    gap: 1em;
+    margin-bottom: 1.2em;
+  }
+
+  &__title {
+    font-size: 1.45em;
+    font-weight: 700;
+    margin: 1em 0;
+  }
+
+  &__hint {
+    opacity: 0.62;
+    line-height: 1.5;
+  }
+}
+
+.lampa-iptv-channels.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(15em, 1fr));
+  gap: 1em;
+}
+
+.lampa-iptv-channels.list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.65em;
+
+  .lampa-iptv-channel {
+    min-height: 4.6em;
+  }
+}
+
+.lampa-iptv-channel {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  min-height: 6.5em;
+  position: relative;
+  padding: 1em;
+  border-radius: 0.9em;
+  background: rgba(255, 255, 255, 0.075);
+  box-sizing: border-box;
+
+  &__logo {
+    width: 3.7em;
+    height: 3.7em;
+    flex: 0 0 auto;
+    border-radius: 0.85em;
+    display: grid;
+    place-items: center;
+    font-weight: 800;
+    background: rgba(83, 209, 141, 0.18);
+    overflow: hidden;
+
+    img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+  }
+
+  &__body {
+    min-width: 0;
+  }
+
+  &__name {
+    font-weight: 700;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  &__number {
+    display: inline-block;
+    min-width: 2.2em;
+    margin-right: 0.35em;
+    color: var(--iptv-accent);
+  }
+
+  &__category,
+  &__status {
+    margin-top: 0.35em;
+    font-size: 0.82em;
+    opacity: 0.65;
+  }
+
+  &__favorite {
+    position: absolute;
+    right: 0.65em;
+    top: 0.45em;
+    color: #ffd166;
+  }
+}
+
+.status-online {
+  color: var(--iptv-accent);
+}
+
+.status-slow,
+.status-cors_unknown,
+.status-auth_required {
+  color: var(--iptv-warning);
+}
+
+.status-offline,
+.status-unsupported {
+  color: var(--iptv-danger);
+}
+
+.lampa-iptv-empty,
+.lampa-iptv-action,
+.lampa-iptv-source-card,
+.lampa-iptv-field {
+  padding: 1em 1.2em;
+  border-radius: 0.8em;
+  background: rgba(255, 255, 255, 0.075);
+  margin-bottom: 0.7em;
+  box-sizing: border-box;
+
+  &__title {
+    font-weight: 700;
+  }
+
+  &__subtitle {
+    margin-top: 0.35em;
+    font-size: 0.86em;
+    line-height: 1.35;
+    opacity: 0.62;
+    overflow-wrap: anywhere;
+  }
+}
+
+.lampa-iptv-actions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(16em, 1fr));
+  gap: 0.75em;
+}
+
+.lampa-iptv-source-card.adult {
+  border-left: 0.3em solid rgba(255, 107, 107, 0.6);
+}
+
+.lampa-iptv-channel-settings,
+.lampa-iptv-fields,
+.lampa-iptv-epg-list {
+  max-width: 70em;
+}
+
+.lampa-iptv-editor__notice {
+  padding: 1em 1.2em;
+  margin-bottom: 1em;
+  border-radius: 0.8em;
+  background: rgba(255, 191, 105, 0.16);
+  color: #ffe0b7;
+  line-height: 1.45;
+}
+
+.lampa-iptv-facts {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(20em, 1fr));
+  gap: 0.4em 1em;
+  margin-bottom: 1.4em;
+}
+
+.lampa-iptv-fact {
+  display: flex;
+  justify-content: space-between;
+  gap: 1em;
+  padding: 0.65em 0;
+  border-bottom: 0.08em solid rgba(255, 255, 255, 0.1);
+
+  &__name {
+    opacity: 0.62;
+  }
+
+  &__value {
+    text-align: right;
+    overflow-wrap: anywhere;
+  }
+}
+
+.lampa-iptv-log__entry {
+  padding: 0.55em 0;
+  line-height: 1.4;
+  border-bottom: 0.08em solid rgba(255, 255, 255, 0.08);
+
+  &.warning {
+    color: #ffdda8;
+  }
+
+  &.error {
+    color: #ffb1b1;
+  }
+}
+
+.lampa-iptv-textarea-wrap {
+  width: min(70vw, 70em);
+}
+
+.lampa-iptv-textarea-hint {
+  margin-bottom: 0.75em;
+  opacity: 0.7;
+}
+
+.lampa-iptv-textarea {
+  width: 100%;
+  min-height: 45vh;
+  padding: 1em;
+  box-sizing: border-box;
+  resize: vertical;
+  color: #fff;
+  background: #10151b;
+  border: 0.12em solid rgba(255, 255, 255, 0.25);
+  border-radius: 0.65em;
+  font: 1em/1.4 monospace;
+}
+
+.lampa-iptv-report pre {
+  max-height: 55vh;
+  overflow: auto;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+.lampa-iptv-program {
+  min-width: min(65vw, 55em);
+  line-height: 1.45;
+
+  &__current {
+    font-size: 1.25em;
+    font-weight: 700;
+  }
+
+  &__next {
+    margin: 0.8em 0 1.2em;
+    opacity: 0.78;
+  }
+
+  &__item {
+    padding: 0.55em 0;
+    border-bottom: 0.08em solid rgba(255, 255, 255, 0.1);
+  }
+
+  &__progress {
+    height: 0.35em;
+    margin-top: 0.65em;
+    border-radius: 1em;
+    background: rgba(255, 255, 255, 0.12);
+    overflow: hidden;
+
+    div {
+      height: 100%;
+      background: var(--iptv-accent);
+    }
+  }
+}
+
+.lampa-iptv-low-power .lampa-iptv .selector {
+  transition: none !important;
+}
+
+@media (max-width: 900px) {
+  .lampa-iptv {
+    padding: 1.2em 1em 3em;
+
+    &__header {
+      display: block;
+    }
+
+    &__layout {
+      display: block;
+    }
+
+    &__navigation {
+      position: static;
+      flex-direction: row;
+      overflow-x: auto;
+      padding: 0.25em;
+      margin-bottom: 1.2em;
+    }
+  }
+
+  .lampa-iptv-nav {
+    white-space: nowrap;
+  }
+
+  .lampa-iptv-channels.grid {
+    grid-template-columns: repeat(auto-fill, minmax(12em, 1fr));
+  }
+}
